@@ -191,8 +191,8 @@ CatRun.prototype.draw = function () {
 
 
 function Jumping(game) {
-    this.jumpAnimation = new Animation(AM.getAsset("./img/jump.png"), 0, 0, 302, 306, 0.18, 7, true, 0.8, false);
-    this.walkAnimation = new Animation(AM.getAsset("./img/walk.png"), 0, 0, 302, 278, 0.18, 7, true, 0.8, false);
+    this.jumpAnimation = new Animation(AM.getAsset("./img/jump.png"), 0, 0, 302, 306, 0.18, 7, false, 0.8, false);
+    this.walkAnimation = new Animation(AM.getAsset("./img/walk.png"), 0, 0, 302, 278, 0.18, 7, false, 0.8, false);
     this.speed = 50;
     this.ctx = game.ctx;
     this.jumping = false;
@@ -206,15 +206,14 @@ Jumping.prototype.constructor = Jumping;
 Jumping.prototype.update = function () {
     this.x += this.game.clockTick * this.speed;
     if (this.walking){ // walking
-        debugger;
-        if(this.walkAnimation.elapsedTime + this.game.clockTick >= this.walkAnimation.totalTime){
+        if(this.walkAnimation.isDone()){
             this.walkAnimation.elapsedTime = 0;
             this.jumping = true;
             this.walking = false;
         }
     } 
     if (this.jumping) {
-        if (this.jumpAnimation.elapsedTime + this.game.clockTick >= this.jumpAnimation.totalTime) {
+        if (this.jumpAnimation.isDone()) {
             this.jumpAnimation.elapsedTime = 0;
             this.jumping = false;
             this.walking = true;
