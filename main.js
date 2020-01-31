@@ -16,6 +16,7 @@ function Animation(spriteSheet, startX, startY, frameWidth, frameHeight, frameDu
 }
 
 Animation.prototype.drawFrame = function (tick, ctx, x, y) {
+    this.elapsedTime += tick;
     if (this.loop) {
         if (this.isDone()) {
             this.elapsedTime = 0;
@@ -23,7 +24,7 @@ Animation.prototype.drawFrame = function (tick, ctx, x, y) {
     } else if (this.isDone()) {
         return;
     }
-    this.elapsedTime += tick;
+    //this.elapsedTime += tick;
     var index = this.reverse ? this.frames - this.currentFrame() - 1 : this.currentFrame();
     var vindex = 0;
     if ((index + 1) * this.frameWidth + this.startX > this.spriteSheet.width) {
@@ -116,10 +117,10 @@ Spin.prototype.draw = function () {
 }
 
 function CatMoon(game, spritesheet) {
-    this.animation = new Animation(spritesheet, 0, 0, 500, 380, 0.14, 10, true, 0.7, false);
+    this.animation = new Animation(spritesheet, 0, 0, 480, 370, 0.14, 10, true, 0.7, false);
     this.speed = 115;
     this.ctx = game.ctx;
-    Entity.call(this, game, 0, -10);
+    Entity.call(this, game, 0, -20);
 }
 
 CatMoon.prototype = new Entity();
@@ -171,7 +172,7 @@ function CatRun(game, spritesheet) {
     this.animation = new Animation(spritesheet, 0, 0, 243, 110, 0.1, 12, true, 0.9, false);
     this.speed = 150;
     this.ctx = game.ctx;
-    Entity.call(this, game, 698, 190);
+    Entity.call(this, game, 698, 270);
 }
 
 CatRun.prototype = new Entity();
@@ -188,14 +189,15 @@ CatRun.prototype.draw = function () {
     Entity.prototype.draw.call(this);
 }
 
+
 function Jumping(game) {
-    this.jumpAnimation = new Animation(AM.getAsset("./img/jump.png"), 0, 0, 302, 306, 0.2, 7, true, 0.8, false);
-    this.walkAnimation = new Animation(AM.getAsset("./img/walk.png"), 0, 0, 302, 278, 0.2, 7, true, 0.8, false);
+    this.jumpAnimation = new Animation(AM.getAsset("./img/jump.png"), 0, 0, 302, 306, 0.18, 7, true, 0.8, false);
+    this.walkAnimation = new Animation(AM.getAsset("./img/walk.png"), 0, 0, 302, 278, 0.18, 7, true, 0.8, false);
     this.speed = 50;
     this.ctx = game.ctx;
     this.jumping = false;
     this.walking = true;
-    Entity.call(this, game, 0, 350);
+    Entity.call(this, game, 0, 400);
 }
 
 Jumping.prototype = new Entity();
@@ -204,16 +206,15 @@ Jumping.prototype.constructor = Jumping;
 Jumping.prototype.update = function () {
     this.x += this.game.clockTick * this.speed;
     if (this.walking){ // walking
-        if(this.walkAnimation.isDone()){
-            console.log("done walk");
-            // elapsedTime resets the 
+        debugger;
+        if(this.walkAnimation.elapsedTime + this.game.clockTick >= this.walkAnimation.totalTime){
             this.walkAnimation.elapsedTime = 0;
             this.jumping = true;
             this.walking = false;
         }
     } 
     if (this.jumping) {
-        if (this.jumpAnimation.isDone()) {
+        if (this.jumpAnimation.elapsedTime + this.game.clockTick >= this.jumpAnimation.totalTime) {
             this.jumpAnimation.elapsedTime = 0;
             this.jumping = false;
             this.walking = true;
@@ -226,18 +227,17 @@ Jumping.prototype.update = function () {
 
         //var height = jumpDistance * 2 * totalHeight;
         var height = totalHeight*(-4 * (jumpDistance * jumpDistance - jumpDistance));
-        this.y = 350 - height;
+        this.y = 400 - height;
         this.x += 1;
     }
     if (this.x > 1125){
         this.x = 0; 
-        this.y = 350;
+        this.y = 400;
     }
     Entity.prototype.update.call(this);
 }
 
 Jumping.prototype.draw = function () {
-    console.log("here" + this.x);
     if (this.walking){ // walking
         this.walkAnimation.drawFrame(this.game.clockTick, this.ctx, this.x, this.y);
     } else if (this.jumping) { // jumping
@@ -245,9 +245,6 @@ Jumping.prototype.draw = function () {
     }
     Entity.prototype.draw.call(this);
 }
-
-
-
 
 AM.queueDownload("./img/background2.jpg");
 AM.queueDownload("./img/kisspower1.png");
